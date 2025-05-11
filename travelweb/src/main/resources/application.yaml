@@ -1,0 +1,21 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /ltweb
+
+paypal:
+  client:
+    id: AfQORIPGgUwEako50TWVAG2cqdbkFjLf8_sWzrDcfNZAteQSyErHfZxcdPc8SyRGbi5k41Co-c3jzvT_
+    secret: EASwDuUUADdtWRHtTgBoXtkLKbPComIxpC8yN633VuNidq-2Ti1z_lV9hYtcEjnzU9OaPAy1IQK-ePIx
+  mode: sandbox
+
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/travel"
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
