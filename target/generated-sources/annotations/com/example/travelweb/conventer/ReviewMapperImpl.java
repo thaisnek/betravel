@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-11T15:34:49+0700",
+    date = "2025-05-24T19:37:45+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Amazon.com Inc.)"
 )
 @Component
@@ -46,6 +46,7 @@ public class ReviewMapperImpl implements ReviewMapper {
         reviewResponse.tourId( reviewTourTourID( review ) );
         reviewResponse.userId( reviewUserUserID( review ) );
         reviewResponse.reviewId( review.getReviewID() );
+        reviewResponse.fullName( reviewUserFullName( review ) );
         reviewResponse.rating( review.getRating() );
         reviewResponse.comment( review.getComment() );
         reviewResponse.timestamp( review.getTimestamp() );
@@ -88,9 +89,7 @@ public class ReviewMapperImpl implements ReviewMapper {
 
         User.UserBuilder user = User.builder();
 
-        if ( reviewRequest.getUserId() != null ) {
-            user.userID( reviewRequest.getUserId() );
-        }
+        user.userID( reviewRequest.getUserId() );
 
         return user.build();
     }
@@ -115,7 +114,25 @@ public class ReviewMapperImpl implements ReviewMapper {
         if ( user == null ) {
             return null;
         }
-        long userID = user.getUserID();
+        Long userID = user.getUserID();
+        if ( userID == null ) {
+            return null;
+        }
         return userID;
+    }
+
+    private String reviewUserFullName(Review review) {
+        if ( review == null ) {
+            return null;
+        }
+        User user = review.getUser();
+        if ( user == null ) {
+            return null;
+        }
+        String fullName = user.getFullName();
+        if ( fullName == null ) {
+            return null;
+        }
+        return fullName;
     }
 }

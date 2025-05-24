@@ -15,7 +15,7 @@ public class ReviewResponse {
     private int reviewId;
     private Long tourId;
     private Long userId;
-    private String username;
+    private String fullName;
     private int rating;
     private String comment;
     private Date timestamp;

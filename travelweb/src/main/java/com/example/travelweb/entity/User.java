@@ -4,10 +4,7 @@ import com.example.travelweb.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "tbl_user")
@@ -20,7 +17,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userID;
+    private Long userID;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -34,6 +31,8 @@ public class User {
     private String fullName;
     private String phoneNumber;
     private String address;
+
+    private String avatar;
 
     private boolean isActive;
     private UserStatus status;

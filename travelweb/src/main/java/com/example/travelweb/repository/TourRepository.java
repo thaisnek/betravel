@@ -1,6 +1,8 @@
 package com.example.travelweb.repository;
 
 import com.example.travelweb.entity.Tour;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,22 +14,24 @@ import java.util.List;
 @Repository
 public interface TourRepository extends JpaRepository<Tour, Long> {
 
-    List<Tour> findByAvailabilityTrue();
-
     List<Tour> findByTourIDIn(List<Long> tourIds);
 
-    @Query("SELECT t FROM Tour t WHERE " +
-            "(:minPrice IS NULL OR t.priceAdult >= :minPrice) AND " +
-            "(:maxPrice IS NULL OR t.priceAdult <= :maxPrice) AND " +
-            "(:domain IS NULL OR t.domain = :domain) AND " +
-            "(:duration IS NULL OR t.duration = :duration) AND " +
-            "(:tourIds IS NULL OR t.tourID IN :tourIds)")
-    List<Tour> filterTours(
+    @Query("SELECT t FROM Tour t " +
+            "WHERE (:minPrice IS NULL OR t.priceAdult >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR t.priceAdult <= :maxPrice) " +
+            "AND (:domain IS NULL OR t.domain = :domain) " +
+            "AND (:duration IS NULL OR t.duration = :duration) " +
+            "AND (:tourIds IS NULL OR t.tourID IN :tourIds)")
+    Page<Tour> filterTours(
             @Param("minPrice") Long minPrice,
             @Param("maxPrice") Long maxPrice,
             @Param("domain") String domain,
             @Param("duration") String duration,
-            @Param("tourIds") List<Long> tourIds);
+            @Param("tourIds") List<Long> tourIds,
+            Pageable pageable
+    );
+
+
 
     @Query("SELECT t FROM Tour t WHERE " +
             "(:destination IS NULL OR t.destination = :destination) AND " +

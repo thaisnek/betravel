@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingRequest {
-    private long userId;
-    private long tourId;
+    private Long userId;
+    private Long tourId;
     private int numAdults;
     private int numChildren;
     private long totalPrice;
@@ -20,4 +20,5 @@ public class BookingRequest {
     private String address;
     private String phoneNumber;
     private String paymentMethod;
+    private String promotionCode;
 }

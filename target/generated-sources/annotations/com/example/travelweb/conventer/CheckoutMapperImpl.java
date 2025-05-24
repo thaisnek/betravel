@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-11T09:23:59+0700",
+    date = "2025-05-24T16:57:46+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Amazon.com Inc.)"
 )
 @Component
@@ -59,9 +59,7 @@ public class CheckoutMapperImpl implements CheckoutMapper {
 
         Booking booking = new Booking();
 
-        if ( checkoutRequest.getBookingId() != null ) {
-            booking.setBookingID( checkoutRequest.getBookingId() );
-        }
+        booking.setBookingID( checkoutRequest.getBookingId() );
 
         return booking;
     }
@@ -74,7 +72,10 @@ public class CheckoutMapperImpl implements CheckoutMapper {
         if ( booking == null ) {
             return null;
         }
-        long bookingID = booking.getBookingID();
+        Long bookingID = booking.getBookingID();
+        if ( bookingID == null ) {
+            return null;
+        }
         return bookingID;
     }
 }

@@ -9,11 +9,12 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {TimelineMapper.class, ImageMapper.class})
+@Mapper(componentModel = "spring", uses = {TimelineMapper.class, ImageMapper.class, ReviewMapper.class})
 public interface TourMapper {
     @Mapping(source = "tourID", target = "tourID")
     @Mapping(source = "title", target = "title")
-    @Mapping(source = "images", target = "images")
+    @Mapping(source = "timeLines", target = "timelines")
+    @Mapping(source = "reviews", target = "reviews")
     TourResponse toTourResponseDTO(Tour tour);
 
     List<TourResponse> toTourResponseDTOList(List<Tour> tours);
@@ -22,6 +23,5 @@ public interface TourMapper {
     TourDetailResponse toTourDetailResponseDTO(Tour tour);
 
     @Mapping(source = "timelines", target = "timeLines")
-    @Mapping(source = "images", target = "images")
     Tour toEntity(TourCreation tourRequestDTO);
 }

@@ -24,5 +24,4 @@ public class TourCreation {
     private Date startDate;
     private Date endDate;
     private List<TimelineCreation> timelines;
-    private List<ImageCreation> images;
 }

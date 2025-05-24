@@ -11,6 +11,7 @@ import com.example.travelweb.dto.response.TourDetailResponse;
 import com.example.travelweb.dto.response.TourResponse;
 import com.example.travelweb.dto.response.TourResponseWrapper;
 import com.example.travelweb.entity.Image;
+import com.example.travelweb.entity.Review;
 import com.example.travelweb.entity.Timeline;
 import com.example.travelweb.entity.Tour;
 import com.example.travelweb.repository.ImageRepository;
@@ -20,14 +21,20 @@ import com.example.travelweb.repository.TourRepository;
 import com.example.travelweb.service.TourService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
@@ -56,6 +63,9 @@ public class TourServiceImpl implements TourService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Value("${tour.upload.dir}")
+    private String imageUploadDir;
+
     @Override
     public TourResponse createTour(TourCreation tourCreation) {
         Tour tour = tourMapper.toEntity(tourCreation);
@@ -65,23 +75,73 @@ public class TourServiceImpl implements TourService {
                 timeline.setTour(tour);
             }
         }
-        if (tour.getImages() != null) {
-            for (Image image : tour.getImages()) {
-                image.setTour(tour);
-            }
-        }
 
         Tour savedTour = tourRepository.save(tour);
         return tourMapper.toTourResponseDTO(savedTour);
     }
 
     @Override
-    public List<TourResponse> getAllAvailableTours() {
-        List<Tour> tours = tourRepository.findByAvailabilityTrue();
-        return tours.stream()
-                .map(tourMapper::toTourResponseDTO)
-                .toList();
+    public List<String> uploadTourImages(Long tourId, MultipartFile[] imageFiles, boolean replaceOldImages) {
+        Tour tour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new RuntimeException("Tour not found with ID: " + tourId));
+
+        if (replaceOldImages) {
+            List<Image> oldImages = tour.getImages();
+            for (Image oldImage : oldImages) {
+                Path oldFilePath = Paths.get(imageUploadDir, oldImage.getImageURL());
+                try {
+                    if (Files.exists(oldFilePath)) {
+                        Files.delete(oldFilePath);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("Không thể xóa ảnh cũ: " + e.getMessage());
+                }
+            }
+            tour.getImages().clear();
+            tourRepository.save(tour);
+        }
+
+        List<String> fileNames = new ArrayList<>();
+
+        if (imageFiles != null && imageFiles.length > 0) {
+            for (MultipartFile imageFile : imageFiles) {
+                if (!imageFile.isEmpty()) {
+                    String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+                    Path filePath = Paths.get(imageUploadDir, fileName);
+
+                    try {
+                        Files.createDirectories(filePath.getParent());
+                        Files.write(filePath, imageFile.getBytes());
+
+                        Image image = new Image();
+                        image.setImageURL(fileName);
+                        image.setTour(tour);
+                        imageRepository.save(image);
+
+                        fileNames.add(fileName);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Không thể lưu ảnh cho tour: " + e.getMessage());
+                    }
+                }
+            }
+        }
+
+        return fileNames;
     }
+
+    private Integer calculateAverageRating(List<Review> reviews) {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0;
+        }
+
+        double average = reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+
+        return (int) Math.round(average);
+    }
+
 
     @Override
     public TourDetailResponse getTourDetails(Long tourID) {
@@ -93,14 +153,27 @@ public class TourServiceImpl implements TourService {
         TourDetailResponse tourDetailResponseDTO = tourMapper.toTourDetailResponseDTO(tour);
         tourDetailResponseDTO.setTimelines(timelineMapper.toTimelineResponseDTOList(timelines));
         tourDetailResponseDTO.setImages(imageMapper.toImageResponseDTOList(images));
+
+        // Tính và set rating trung bình
+        Integer avgRating = calculateAverageRating(tour.getReviews());
+        tourDetailResponseDTO.setAverageRating(avgRating);
+
         return tourDetailResponseDTO;
     }
 
     @Override
     public List<TourResponse> getLimitedTours() {
-        List<Tour> tours = tourRepository.findAll(); // Lấy tất cả các phòng
-        // Giới hạn chỉ lấy 8 phòng đầu tiên
-        return tours.stream().limit(8).map(tourMapper::toTourResponseDTO).toList();
+        List<Tour> tours = tourRepository.findAll();
+
+        return tours.stream()
+                .limit(8)
+                .map(tour -> {
+                    TourResponse tourResponse = tourMapper.toTourResponseDTO(tour);
+                    Integer avgRating = calculateAverageRating(tour.getReviews());
+                    tourResponse.setAverageRating(avgRating);
+                    return tourResponse;
+                })
+                .toList();
     }
 
     @Override
@@ -142,52 +215,32 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
-    public List<TourResponse> filterTours(Map<String, Object> conditions) {
-        // Xử lý điều kiện lọc
+    public Page<TourResponse> filterTours(Map<String, Object> conditions, Pageable pageable) {
         Long minPrice = (Long) conditions.get("minPrice");
         Long maxPrice = (Long) conditions.get("maxPrice");
         String domain = (String) conditions.get("domain");
-        Double averageRating = (Double) conditions.get("averageRating");
         String duration = (String) conditions.get("duration");
 
-        // Xử lý điều kiện trung bình sao
+        Integer star = (Integer) conditions.get("star");
         List<Long> tourIds = null;
-        if (averageRating != null) {
-            tourIds = reviewRepository.findTourIdsByAverageRating(averageRating);
+        if (star != null) {
+            tourIds = reviewRepository.findTourIdsByAverageRating(star);
             if (tourIds.isEmpty()) {
-                return Collections.emptyList(); // Không có tour nào thỏa mãn trung bình sao
+                return Page.empty(pageable);
             }
         }
 
-        // Truy vấn dữ liệu với các điều kiện
-        List<Tour> tours = tourRepository.filterTours(minPrice, maxPrice, domain, duration, tourIds);
+        Page<Tour> tours = tourRepository.filterTours(minPrice, maxPrice, domain, duration, tourIds, pageable);
 
-        // Chuyển đổi sang TourResponse
-        List<TourResponse> tourResponses = tours.stream()
-                .map(tourMapper::toTourResponseDTO)
-                .collect(Collectors.toList());
-
-        // Xử lý sắp xếp
-        String sorting = (String) conditions.get("sorting");
-        if (sorting != null && !sorting.isEmpty()) {
-            switch (sorting) {
-                case "new":
-                    tourResponses.sort(Comparator.comparing(TourResponse::getTourID, Comparator.reverseOrder()));
-                    break;
-                case "old":
-                    tourResponses.sort(Comparator.comparing(TourResponse::getTourID));
-                    break;
-                case "hight-to-low":
-                    tourResponses.sort(Comparator.comparing(TourResponse::getPriceAdult, Comparator.reverseOrder()));
-                    break;
-                case "low-to-high":
-                    tourResponses.sort(Comparator.comparing(TourResponse::getPriceAdult));
-                    break;
-            }
-        }
-
-        return tourResponses;
+        return tours.map(tour -> {
+            TourResponse tourResponse = tourMapper.toTourResponseDTO(tour);
+            Integer avgRating = calculateAverageRating(tour.getReviews());
+            tourResponse.setAverageRating(avgRating);
+            return tourResponse;
+        });
     }
+
+
 
     @Override
     public TourResponseWrapper<List<TourResponse>> searchTours(String destination, LocalDate startDate, LocalDate endDate) {
@@ -210,7 +263,7 @@ public class TourServiceImpl implements TourService {
     public TourResponse updateTour(Long id, TourRequest request) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tour not found"));
-        // Update fields from request
+
         tour.setTitle(request.getTitle());
         tour.setDescription(request.getDescription());
         tour.setDuration(request.getDuration());
@@ -223,28 +276,15 @@ public class TourServiceImpl implements TourService {
         tour.setStartDate(request.getStartDate());
         tour.setEndDate(request.getEndDate());
 
-        // --- Xử lý timelines ---
-        // Xóa hết timeline cũ
+
         tour.getTimeLines().clear();
         if (request.getTimelines() != null) {
             for (TimelineCreation t : request.getTimelines()) {
                 Timeline timeline = new Timeline();
                 timeline.setDay(t.getDay());
                 timeline.setDescription(t.getDescription());
-                timeline.setTour(tour); // quan trọng!
+                timeline.setTour(tour);
                 tour.getTimeLines().add(timeline);
-            }
-        }
-
-        // --- Xử lý images ---
-        tour.getImages().clear();
-        if (request.getImages() != null) {
-            for (ImageCreation img : request.getImages()) {
-                Image image = new Image();
-                image.setImageURL(img.getImageURL());
-                image.setDescription(img.getDescription());
-                image.setTour(tour); // quan trọng!
-                tour.getImages().add(image);
             }
         }
 

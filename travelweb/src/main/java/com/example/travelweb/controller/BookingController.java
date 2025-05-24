@@ -33,18 +33,15 @@ public class BookingController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createBooking(@RequestBody BookingRequest bookingRequest) {
-        // Kiểm tra sức chứa tour trước khi tạo booking
         TourDetailResponse tour = tourService.getTourDetails(bookingRequest.getTourId());
-        int totalParticipants = tour.getQuantity() - bookingRequest.getNumAdults() - bookingRequest.getNumChildren();
-        if (tour.getQuantity() < totalParticipants) {
+        int numRequested = bookingRequest.getNumAdults() + bookingRequest.getNumChildren();
+        if (tour.getQuantity() < numRequested) {
             throw new IllegalStateException("Không đủ slot cho tour này");
         }
-
-        // Tạo booking
         BookingResponse booking = bookingService.createBooking(bookingRequest);
 
-        // Cập nhật sức chứa tour
-        tourService.updateTourQuantity(bookingRequest.getTourId(), totalParticipants);
+        int newQuantity = tour.getQuantity() - numRequested;
+        tourService.updateTourQuantity(bookingRequest.getTourId(), newQuantity);
         return ResponseEntity.ok(booking);
     }
 }

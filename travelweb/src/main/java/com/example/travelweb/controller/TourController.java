@@ -9,17 +9,18 @@ import com.example.travelweb.repository.TourRepository;
 import com.example.travelweb.service.TourSearchService;
 import com.example.travelweb.service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/tours")
 @CrossOrigin(origins = "http://localhost:3000")
 public class TourController {
     @Autowired
@@ -29,10 +30,27 @@ public class TourController {
     private TourSearchService tourSearchService;
 
     @GetMapping("/all-tours")
-    public ResponseEntity<List<TourResponse>> getAllAvailableTours() {
-        List<TourResponse> tours = tourService.getAllAvailableTours();
-        return ResponseEntity.ok(tours);
+    public Page<TourResponse> getAllTours(
+            @RequestParam(required = false) Long minPrice,
+            @RequestParam(required = false) Long maxPrice,
+            @RequestParam(required = false) String domain,
+            @RequestParam(required = false) Integer star,
+            @RequestParam(required = false) String duration,
+            @RequestParam(required = false) String sorting,
+            @PageableDefault(size = 9) Pageable pageable
+    ) {
+        Map<String, Object> conditions = new HashMap<>();
+        conditions.put("minPrice", minPrice);
+        conditions.put("maxPrice", maxPrice);
+        conditions.put("domain", domain);
+        conditions.put("star", star);
+        conditions.put("duration", duration);
+        conditions.put("sorting", sorting);
+
+        return tourService.filterTours(conditions, pageable);
     }
+
+
 
     @GetMapping("/tour-details/{tourID}")
     public ResponseEntity<TourDetailResponse> getTourDetails(@PathVariable Long tourID) {
@@ -40,49 +58,11 @@ public class TourController {
         return ResponseEntity.ok(tourDetails);
     }
 
-    @GetMapping("/tours/{tourId}/recommendations")
+    @GetMapping("/{tourId}/recommendations")
     public List<TourResponse> getTourRecommendations(@PathVariable Long tourId) {
         return tourService.getTourRecommendations(tourId);
     }
 
-    @GetMapping("/filter")
-    @ResponseBody
-    public ResponseEntity<List<TourResponse>> filterTours(
-            @RequestParam(required = false) Long minPrice,
-            @RequestParam(required = false) Long maxPrice,
-            @RequestParam(required = false) String domain,
-            @RequestParam(required = false) Integer star,
-            @RequestParam(required = false) String time,
-            @RequestParam(required = false) String sorting) {
-
-        // Xây dựng điều kiện lọc
-        Map<String, Object> conditions = new HashMap<>();
-        if (minPrice != null && maxPrice != null) {
-            conditions.put("minPrice", minPrice);
-            conditions.put("maxPrice", maxPrice);
-        }
-        if (domain != null && !domain.isEmpty()) {
-            conditions.put("domain", domain);
-        }
-        if (star != null) {
-            conditions.put("averageRating", (double) star);
-        }
-        if (time != null && !time.isEmpty()) {
-            Map<String, String> timeMap = new HashMap<>();
-            timeMap.put("3N2Đ", "3 ngày 2 đêm");
-            timeMap.put("4N3Đ", "4 ngày 3 đêm");
-            timeMap.put("5N4Đ", "5 ngày 4 đêm");
-            conditions.put("duration", timeMap.getOrDefault(time, time));
-        }
-        if (sorting != null && !sorting.isEmpty()) {
-            conditions.put("sorting", sorting);
-        }
-
-        // Gọi phương thức lọc
-        List<TourResponse> tours = tourService.filterTours(conditions);
-
-        return ResponseEntity.ok(tours);
-    }
 
     @GetMapping("/search")
     public TourResponseWrapper<List<TourResponse>> searchTours(

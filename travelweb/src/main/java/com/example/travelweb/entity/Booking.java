@@ -16,7 +16,7 @@ import java.util.List;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long bookingID;
+    private Long bookingID;
 
     @ManyToOne
     @JoinColumn(name = "userID", nullable = false)

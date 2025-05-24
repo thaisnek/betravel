@@ -23,4 +23,5 @@ public class TourDetailResponse {
     private List<TimelineResponse> timelines;
     private List<ImageResponse> images;
     private List<ReviewResponse> reviews;
+    private Integer averageRating;
 }

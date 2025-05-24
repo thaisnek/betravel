@@ -25,5 +25,4 @@ public class TourRequest {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<TimelineCreation> timelines;
-    private List<ImageCreation> images;
 }

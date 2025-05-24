@@ -1,5 +1,6 @@
 package com.example.travelweb.dto.response;
 
+import com.example.travelweb.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +26,5 @@ public class BookingResponse {
     private String address;
     private String bookingStatus;
     private String paymentMethod;
+
 }

@@ -30,7 +30,7 @@ public class AdminBookingController {
     }
 
     @PutMapping("/{id}/status")
-    public BookingResponse updateBookingStatus(
+        public BookingResponse updateBookingStatus(
             @PathVariable Long id,
             @RequestParam String status
     ) {

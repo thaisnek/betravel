@@ -15,6 +15,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     Double findAverageRatingByTourId(@Param("tourId") Long tourId);
 
     // Lấy danh sách tourID có trung bình sao bằng giá trị mong muốn
-    @Query("SELECT r.tour.tourID FROM Review r GROUP BY r.tour.tourID HAVING AVG(r.rating) = :averageRating")
-    List<Long> findTourIdsByAverageRating(@Param("averageRating") Double averageRating);
+    @Query("SELECT r.tour.tourID FROM Review r GROUP BY r.tour.tourID HAVING ROUND(AVG(r.rating)) = :star")
+    List<Long> findTourIdsByAverageRating(@Param("star") Integer star);
+
 }

@@ -2,8 +2,10 @@ package com.example.travelweb.service.implement;
 
 import com.example.travelweb.conventer.PromotionMapper;
 import com.example.travelweb.dto.request.PromotionRequest;
+import com.example.travelweb.dto.request.PromotionValidateRequest;
 import com.example.travelweb.dto.response.BookingResponse;
 import com.example.travelweb.dto.response.PromotionResponse;
+import com.example.travelweb.dto.response.PromotionValidateResponse;
 import com.example.travelweb.entity.Promotion;
 import com.example.travelweb.repository.PromotionRepository;
 import com.example.travelweb.service.PromotionService;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service
 public class PromotionServiceImpl implements PromotionService {
@@ -37,7 +41,7 @@ public class PromotionServiceImpl implements PromotionService {
     public PromotionResponse updatePromotion(Long id, PromotionRequest request) {
         Promotion promotion = promotionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Promotion not found with id: " + id));
-        // Update fields from request
+
         promotion.setCode(request.getCode());
         promotion.setDescription(request.getDescription());
         promotion.setDiscount(request.getDiscount());
@@ -47,6 +51,45 @@ public class PromotionServiceImpl implements PromotionService {
 
         promotion = promotionRepository.save(promotion);
         return promotionMapper.toPromotionResponse(promotion);
+    }
+
+    public PromotionValidateResponse validatePromotion(PromotionValidateRequest request) {
+        PromotionValidateResponse response = new PromotionValidateResponse();
+
+        Promotion promotion = promotionRepository.findByCode(request.getCode())
+                .orElse(null);
+
+        if (promotion == null) {
+            response.setValid(false);
+            response.setDiscount(0.0);
+            response.setMessage("Mã khuyến mãi không tồn tại.");
+            return response;
+        }
+
+        LocalDate currentDate = LocalDate.now();
+        if (promotion.getStartDate().isAfter(currentDate)) {
+            response.setValid(false);
+            response.setDiscount(0.0);
+            response.setMessage("Mã khuyến mãi chưa có hiệu lực.");
+            return response;
+        }
+        if (promotion.getEndDate().isBefore(currentDate)) {
+            response.setValid(false);
+            response.setDiscount(0.0);
+            response.setMessage("Mã khuyến mãi đã hết hạn.");
+            return response;
+        }
+        if (promotion.getQuantity() <= 0) {
+            response.setValid(false);
+            response.setDiscount(0.0);
+            response.setMessage("Mã khuyến mãi đã hết số lượng sử dụng.");
+            return response;
+        }
+
+        response.setValid(true);
+        response.setDiscount(promotion.getDiscount());
+        response.setMessage("Mã khuyến mãi hợp lệ.");
+        return response;
     }
 
     @Override

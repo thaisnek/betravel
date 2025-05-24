@@ -19,5 +19,8 @@ public class TourResponse {
     private Boolean availability;
     private Date startDate;
     private Date endDate;
+    private List<TimelineResponse> timelines;
     private List<ImageResponse> images;
+    private List<ReviewResponse> reviews;
+    private Integer averageRating;
 }

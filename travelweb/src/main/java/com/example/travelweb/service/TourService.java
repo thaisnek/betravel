@@ -8,6 +8,7 @@ import com.example.travelweb.dto.response.TourResponseWrapper;
 import com.example.travelweb.entity.Tour;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,8 +16,6 @@ import java.util.Map;
 
 public interface TourService {
 
-
-    List<TourResponse> getAllAvailableTours();
 
     TourDetailResponse getTourDetails(Long tourID);
 
@@ -28,8 +27,6 @@ public interface TourService {
 
     List<TourResponse> getTourRecommendations(Long tourId);
 
-    List<TourResponse> filterTours(Map<String, Object> conditions);
-
     TourResponseWrapper<List<TourResponse>> searchTours(String destination, LocalDate startDate, LocalDate endDate);
 
     Page<TourResponse> getAllTours(Pageable pageable);
@@ -37,4 +34,8 @@ public interface TourService {
     TourResponse updateTour(Long id, TourRequest request);
 
     void deleteTour(Long id);
+
+    List<String> uploadTourImages(Long tourId, MultipartFile[] imageFiles, boolean replaceOldImages);
+
+    Page<TourResponse> filterTours(Map<String, Object> conditions, Pageable pageable);
 }

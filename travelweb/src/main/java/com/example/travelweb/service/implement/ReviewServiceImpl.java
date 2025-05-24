@@ -4,10 +4,13 @@ import com.example.travelweb.conventer.ReviewMapper;
 import com.example.travelweb.dto.request.ReviewRequest;
 import com.example.travelweb.dto.response.ReviewResponse;
 import com.example.travelweb.entity.Booking;
+import com.example.travelweb.entity.History;
 import com.example.travelweb.entity.Review;
 import com.example.travelweb.entity.Tour;
+import com.example.travelweb.enums.ActionType;
 import com.example.travelweb.enums.BookingStatus;
 import com.example.travelweb.repository.BookingRepository;
+import com.example.travelweb.repository.HistoryRepository;
 import com.example.travelweb.repository.ReviewRepository;
 import com.example.travelweb.repository.TourRepository;
 import com.example.travelweb.service.ReviewService;
@@ -36,37 +39,42 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private ReviewMapper reviewMapper;
 
+    @Autowired
+    private HistoryRepository historyRepository;
+
     public boolean canReview(Long userId, Long tourId) {
-        // Lấy thông tin tour
+
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new RuntimeException("Tour not found"));
 
-        // Kiểm tra tour đã kết thúc
         LocalDate currentDate = LocalDate.now();
         if (tour.getEndDate().isAfter(currentDate)) {
-            return false; // Tour chưa kết thúc
+            return false;
         }
 
-        // Kiểm tra booking
         List<Booking> bookings = bookingRepository.findByUserUserIDAndTourTourID(userId, tourId);
         return bookings.stream()
                 .anyMatch(booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED);
     }
 
     public ReviewResponse createReview(ReviewRequest requestDTO) {
-        // Kiểm tra điều kiện
+
         if (!canReview(requestDTO.getUserId(), requestDTO.getTourId())) {
             throw new RuntimeException("You must complete the tour to review it");
         }
 
-        // Chuyển DTO thành Entity
         Review review = reviewMapper.toEntity(requestDTO);
-        review.setTimestamp(new Date()); // Đảm bảo timestamp được cập nhật
+        review.setTimestamp(new Date());
 
-        // Lưu vào database
         review = reviewRepository.save(review);
 
-        // Chuyển Entity thành ResponseDTO
+        History history = new History();
+        history.setUser(review.getUser());
+        history.setTour(review.getTour());
+        history.setActionType(ActionType.REVIEW);
+        history.setTimestamp(LocalDate.now());
+        historyRepository.save(history);
+
         return reviewMapper.toResponseDTO(review);
     }
 

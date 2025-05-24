@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-11T09:23:59+0700",
+    date = "2025-05-24T16:57:46+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Amazon.com Inc.)"
 )
 @Component
@@ -75,7 +75,9 @@ public class BookingMapperImpl implements BookingMapper {
 
         Tour tour = new Tour();
 
-        tour.setTourID( bookingRequest.getTourId() );
+        if ( bookingRequest.getTourId() != null ) {
+            tour.setTourID( bookingRequest.getTourId() );
+        }
 
         return tour;
     }
@@ -100,7 +102,10 @@ public class BookingMapperImpl implements BookingMapper {
         if ( user == null ) {
             return null;
         }
-        long userID = user.getUserID();
+        Long userID = user.getUserID();
+        if ( userID == null ) {
+            return null;
+        }
         return userID;
     }
 

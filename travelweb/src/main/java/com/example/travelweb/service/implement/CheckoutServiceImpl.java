@@ -6,8 +6,12 @@ import com.example.travelweb.dto.response.BookingResponse;
 import com.example.travelweb.dto.response.CheckoutResponse;
 import com.example.travelweb.entity.Booking;
 import com.example.travelweb.entity.Checkout;
+import com.example.travelweb.entity.History;
+import com.example.travelweb.enums.ActionType;
+import com.example.travelweb.enums.BookingStatus;
 import com.example.travelweb.repository.BookingRepository;
 import com.example.travelweb.repository.CheckoutRepository;
+import com.example.travelweb.repository.HistoryRepository;
 import com.example.travelweb.service.BookingService;
 import com.example.travelweb.service.CheckoutService;
 import com.example.travelweb.service.PayPalService;
@@ -18,6 +22,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,13 +38,15 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Autowired
     private PayPalService payPalService;
 
+    @Autowired
+    private HistoryRepository historyRepository;
+
     @Override
     @Transactional
     public String initiatePayment(Long bookingId) throws PayPalRESTException {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // Gọi PayPalService để tạo thanh toán
         Payment payment = payPalService.createPayment(
                 bookingId,
                 (double) booking.getTotalPrice() / 23000.0,
@@ -49,7 +56,6 @@ public class CheckoutServiceImpl implements CheckoutService {
                 "http://localhost:8080/ltweb/api/payment/success"
         );
 
-        // Tìm approval_url trong các link trả về
         for (com.paypal.api.payments.Links link : payment.getLinks()) {
             if (link.getRel().equalsIgnoreCase("approval_url")) {
                 return link.getHref();
@@ -64,10 +70,8 @@ public class CheckoutServiceImpl implements CheckoutService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // Hoàn tất thanh toán qua PayPalService
         Payment executedPayment = payPalService.executePayment(paymentId, payerId);
 
-        // Tạo checkout khi thanh toán thành công
         Checkout checkout = new Checkout();
         checkout.setBooking(booking);
         checkout.setPaymentMethod("paypal");
@@ -77,7 +81,13 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         Checkout savedCheckout = checkoutRepository.save(checkout);
 
-        // Trả về CheckoutResponse
+        History history = new History();
+        history.setUser(booking.getUser());
+        history.setTour(booking.getTour());
+        history.setActionType(ActionType.PAY);
+        history.setTimestamp(LocalDate.now());
+        historyRepository.save(history);
+
         return new CheckoutResponse(
                 savedCheckout.getCheckoutID(),
                 bookingId,
@@ -91,7 +101,5 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Override
     @Transactional
     public void cancelPayment(Long bookingId) {
-        // Không tạo checkout khi hủy
-        // Booking status sẽ được cập nhật trong PaymentController
     }
 }
