@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminCreateRequest {
+public class RegisterRequest {
     private String username;
     private String password;
-    private String email;
     private String fullName;
-    private String address;
-    private String phone;
 }

@@ -1,5 +1,4 @@
-package com.example.travelweb.dto.request;
-
+package com.example.travelweb.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCreation {
-    private String username;
+public class TopCustomerResponse {
+    private Long id;
     private String fullName;
-    private String password;
+    private Long totalPurchases;
+    private Long totalAmount;
 }

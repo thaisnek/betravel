@@ -1,12 +1,10 @@
 package com.example.travelweb.entity;
 
-import com.example.travelweb.enums.SenderRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @Entity
@@ -27,9 +25,7 @@ public class Chat {
     private Admin admin;
 
     private String messages;
-    private boolean readStatus;
     private LocalDate createdDate;
 
-    @Enumerated(EnumType.STRING)
-    private SenderRole senderRole;
+    private String senderRole;
 }

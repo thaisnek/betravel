@@ -16,7 +16,6 @@ public class ChatResponse {
     private Long userID;
     private Integer adminID;
     private String messages;
-    private boolean readStatus;
     private LocalDate createdDate;
     private String senderRole;
 }

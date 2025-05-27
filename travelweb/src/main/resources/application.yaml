@@ -31,3 +31,7 @@ tour:
   upload:
     dir: C:/Users/Dinh Thai/Documents/images/tour
 
+jwt:
+  secret: "u8d7f6g5h4j3k2l1m0n9b8v7c6x5z4a3s2d1f0g9h8j7k6l5m4n3b2v1c0x9z8a7s6d5"
+  expiration-ms: 86400000
+

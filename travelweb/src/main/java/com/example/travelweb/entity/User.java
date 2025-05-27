@@ -1,6 +1,5 @@
 package com.example.travelweb.entity;
 
-import com.example.travelweb.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +24,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
     private String fullName;
@@ -33,9 +32,6 @@ public class User {
     private String address;
 
     private String avatar;
-
-    private boolean isActive;
-    private UserStatus status;
 
     @Temporal(TemporalType.DATE)
     private Date createdDate;

@@ -14,6 +14,10 @@ import java.time.LocalDate;
 public class AdminResponse {
     private Integer adminID;
     private String username;
+    private String password;
     private String email;
+    private String fullName;
+    private String address;
+    private String phone;
     private LocalDate createdDate;
 }

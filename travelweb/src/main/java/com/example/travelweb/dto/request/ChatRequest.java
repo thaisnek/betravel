@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatRequest {
     private Long userID;
-    private Integer adminID;
+    private Long adminID;
     private String messages;
     private String senderRole;
 }

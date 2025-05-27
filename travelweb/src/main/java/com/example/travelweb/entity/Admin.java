@@ -15,10 +15,13 @@ import java.util.List;
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer adminID;
+    private Long adminID;
 
     private String username;
     private String password;
+    private String fullName;
+    private String address;
+    private String phone;
     private String email;
     private LocalDate createdDate;
 

@@ -9,6 +9,7 @@ import com.example.travelweb.entity.User;
 import com.example.travelweb.repository.AdminRepository;
 import com.example.travelweb.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,12 +21,20 @@ public class AdminServiceImpl implements AdminService {
     private AdminRepository adminRepository;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private AdminMapper adminMapper;
 
     public AdminResponse createAdmin(AdminCreateRequest request){
         Admin admin = adminMapper.toEntity(request);
         admin.setCreatedDate(LocalDate.now());
+        admin.setPassword(passwordEncoder.encode(request.getPassword()));
         Admin saved = adminRepository.save(admin);
         return adminMapper.toResponse(saved);
+    }
+
+    public Admin getAdminById(Long adminId) {
+        return adminRepository.findById(adminId).orElse(null);
     }
 }

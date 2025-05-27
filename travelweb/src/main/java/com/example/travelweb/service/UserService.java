@@ -5,15 +5,20 @@ import com.example.travelweb.dto.request.UpdateUserRequest;
 import com.example.travelweb.dto.request.UserCreation;
 import com.example.travelweb.dto.response.UserResponse;
 import com.example.travelweb.entity.User;
+import com.example.travelweb.exception.AppException;
+import com.example.travelweb.exception.ErrorCode;
+import com.example.travelweb.repository.AdminRepository;
 import com.example.travelweb.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.security.auth.login.AccountException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,18 +37,9 @@ public class UserService {
     @Value("${avatar.upload.dir}")
     private String uploadDir;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AdminRepository adminRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    public User userCreation(UserCreation request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setCreatedDate(new Date());
-        return userRepository.save(user);
     }
 
     public User updateUser(Long userId, UpdateUserRequest updateUserDto) {

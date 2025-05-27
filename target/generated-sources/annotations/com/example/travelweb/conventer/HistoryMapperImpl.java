@@ -2,9 +2,11 @@ package com.example.travelweb.conventer;
 
 import com.example.travelweb.dto.response.HistoryResponseDTO;
 import com.example.travelweb.dto.response.ImageResponse;
+import com.example.travelweb.dto.response.ReviewResponse;
 import com.example.travelweb.dto.response.TourResponse;
 import com.example.travelweb.entity.History;
 import com.example.travelweb.entity.Image;
+import com.example.travelweb.entity.Review;
 import com.example.travelweb.entity.Tour;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-24T17:15:30+0700",
+    date = "2025-05-26T06:13:23+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Amazon.com Inc.)"
 )
 @Component
@@ -80,6 +82,33 @@ public class HistoryMapperImpl implements HistoryMapper {
         return list1;
     }
 
+    protected ReviewResponse reviewToReviewResponse(Review review) {
+        if ( review == null ) {
+            return null;
+        }
+
+        ReviewResponse.ReviewResponseBuilder reviewResponse = ReviewResponse.builder();
+
+        reviewResponse.rating( review.getRating() );
+        reviewResponse.comment( review.getComment() );
+        reviewResponse.timestamp( review.getTimestamp() );
+
+        return reviewResponse.build();
+    }
+
+    protected List<ReviewResponse> reviewListToReviewResponseList(List<Review> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<ReviewResponse> list1 = new ArrayList<ReviewResponse>( list.size() );
+        for ( Review review : list ) {
+            list1.add( reviewToReviewResponse( review ) );
+        }
+
+        return list1;
+    }
+
     protected TourResponse tourToTourResponse(Tour tour) {
         if ( tour == null ) {
             return null;
@@ -104,6 +133,7 @@ public class HistoryMapperImpl implements HistoryMapper {
             tourResponse.setEndDate( Date.from( tour.getEndDate().atStartOfDay( ZoneOffset.UTC ).toInstant() ) );
         }
         tourResponse.setImages( imageListToImageResponseList( tour.getImages() ) );
+        tourResponse.setReviews( reviewListToReviewResponseList( tour.getReviews() ) );
 
         return tourResponse;
     }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/home")
 @CrossOrigin(origins = "http://localhost:3000")
 public class HomeController {
 

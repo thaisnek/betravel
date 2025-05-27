@@ -52,8 +52,8 @@ public class CheckoutServiceImpl implements CheckoutService {
                 (double) booking.getTotalPrice() / 23000.0,
                 "USD",
                 "Payment for booking ID: " + bookingId,
-                "http://localhost:8080/ltweb/api/payment/cancel",
-                "http://localhost:8080/ltweb/api/payment/success"
+                "http://localhost:3000/payment/cancel",
+                "http://localhost:3000/payment/success"
         );
 
         for (com.paypal.api.payments.Links link : payment.getLinks()) {

@@ -24,14 +24,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @PostMapping("/creation")
-    User createUser(@RequestBody UserCreation request) {
-        return userService.userCreation(request);
-    }
-
     @PutMapping("/update/{userId}")
     public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequest updateUserRequest) {
         try {

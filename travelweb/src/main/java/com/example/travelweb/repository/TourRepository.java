@@ -43,4 +43,5 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
             @Param("endDate") LocalDate endDate
     );
 
+    long countByAvailabilityTrue();
 }
