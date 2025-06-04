@@ -94,6 +94,7 @@ public class BookingServiceImpl implements BookingService {
         History history = new History();
         history.setUser(user);
         history.setTour(tour);
+        history.setBooking(savedBooking);
         history.setActionType(ActionType.BOOK);
         history.setTimestamp(LocalDate.now());
         historyRepository.save(history);

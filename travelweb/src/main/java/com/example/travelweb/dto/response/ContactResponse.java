@@ -5,17 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatResponse {
+public class ContactResponse {
     private Long chatID;
-    private Long userID;
-    private Integer adminID;
-    private String messages;
-    private LocalDate createdDate;
-    private String senderRole;
+    private String fullName;
+    private String phoneNumber;
+    private String email;
+    private String message;
+    private Boolean isReply;
+    private Long userId;
+    private Long adminId;
 }

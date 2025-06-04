@@ -34,7 +34,7 @@ public class AdminServiceImpl implements AdminService {
         return adminMapper.toResponse(saved);
     }
 
-    public Admin getAdminById(Long adminId) {
-        return adminRepository.findById(adminId).orElse(null);
+    public AdminResponse getAdminById(Long adminId) {
+        return adminMapper.toResponse(adminRepository.findById(adminId).get());
     }
 }

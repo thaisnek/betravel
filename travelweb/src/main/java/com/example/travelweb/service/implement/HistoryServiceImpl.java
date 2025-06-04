@@ -32,4 +32,9 @@ public class HistoryServiceImpl implements HistoryService {
         }
         return histories.map(historyMapper::toDto);
     }
+
+    @Override
+    public Page<HistoryResponseDTO> getAllHistory(Pageable pageable) {
+        return historyRepository.findAll(pageable).map(historyMapper::toDto);
+    }
 }

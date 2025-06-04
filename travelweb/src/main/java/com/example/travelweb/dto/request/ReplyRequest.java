@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRequest {
-    private Long userID;
-    private Long adminID;
-    private String messages;
-    private String senderRole;
+public class ReplyRequest {
+    private Long chatID;
+    private String replyMessage;
+    private Long adminId;
 }

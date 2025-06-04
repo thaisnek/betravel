@@ -8,24 +8,25 @@ import java.time.LocalDate;
 
 
 @Entity
-@Table(name = "tbl_chat")
+@Table(name = "tbl_contact")
 @Getter
 @Setter
-public class Chat {
+public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long chatID;
+    private Long chatID;
 
     @ManyToOne
     @JoinColumn(name = "userID", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "adminID", nullable = false)
+    @JoinColumn(name = "adminID")
     private Admin admin;
 
-    private String messages;
-    private LocalDate createdDate;
-
-    private String senderRole;
+    private String fullName;
+    private String phoneNumber;
+    private String email;
+    private String message;
+    private Boolean isReply = false;
 }

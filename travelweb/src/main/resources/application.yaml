@@ -22,6 +22,19 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: thaithai12072004@gmail.com
+    password: ynqq yiqc lhmj yyuk
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
 
 avatar:
   upload:

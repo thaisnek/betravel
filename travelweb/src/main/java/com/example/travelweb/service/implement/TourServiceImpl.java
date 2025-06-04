@@ -125,7 +125,6 @@ public class TourServiceImpl implements TourService {
                 }
             }
         }
-
         return fileNames;
     }
 
@@ -154,7 +153,6 @@ public class TourServiceImpl implements TourService {
         tourDetailResponseDTO.setTimelines(timelineMapper.toTimelineResponseDTOList(timelines));
         tourDetailResponseDTO.setImages(imageMapper.toImageResponseDTOList(images));
 
-        // Tính và set rating trung bình
         Integer avgRating = calculateAverageRating(tour.getReviews());
         tourDetailResponseDTO.setAverageRating(avgRating);
 

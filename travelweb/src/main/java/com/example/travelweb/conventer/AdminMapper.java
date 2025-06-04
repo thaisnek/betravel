@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 public interface AdminMapper {
     @Mapping(target = "adminID", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "chats", ignore = true)
     Admin toEntity(AdminCreateRequest request);
 
     AdminResponse toResponse(Admin admin);

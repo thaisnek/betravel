@@ -1,13 +1,16 @@
 package com.example.travelweb.conventer;
 
+import com.example.travelweb.dto.response.BookingResponse;
 import com.example.travelweb.dto.response.HistoryResponseDTO;
 import com.example.travelweb.dto.response.ImageResponse;
 import com.example.travelweb.dto.response.ReviewResponse;
 import com.example.travelweb.dto.response.TourResponse;
+import com.example.travelweb.entity.Booking;
 import com.example.travelweb.entity.History;
 import com.example.travelweb.entity.Image;
 import com.example.travelweb.entity.Review;
 import com.example.travelweb.entity.Tour;
+import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-26T06:13:23+0700",
+    date = "2025-06-02T19:48:28+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Amazon.com Inc.)"
 )
 @Component
@@ -36,6 +39,7 @@ public class HistoryMapperImpl implements HistoryMapper {
         historyResponseDTO.timestamp( history.getTimestamp() );
         historyResponseDTO.tourTitle( historyTourTitle( history ) );
         historyResponseDTO.tourResponse( tourToTourResponse( history.getTour() ) );
+        historyResponseDTO.bookingResponse( bookingToBookingResponse( history.getBooking() ) );
 
         return historyResponseDTO.build();
     }
@@ -136,5 +140,31 @@ public class HistoryMapperImpl implements HistoryMapper {
         tourResponse.setReviews( reviewListToReviewResponseList( tour.getReviews() ) );
 
         return tourResponse;
+    }
+
+    protected BookingResponse bookingToBookingResponse(Booking booking) {
+        if ( booking == null ) {
+            return null;
+        }
+
+        BookingResponse.BookingResponseBuilder bookingResponse = BookingResponse.builder();
+
+        bookingResponse.bookingID( booking.getBookingID() );
+        if ( booking.getBookingDate() != null ) {
+            bookingResponse.bookingDate( new SimpleDateFormat().format( booking.getBookingDate() ) );
+        }
+        bookingResponse.numAdults( booking.getNumAdults() );
+        bookingResponse.numChildren( booking.getNumChildren() );
+        bookingResponse.totalPrice( booking.getTotalPrice() );
+        bookingResponse.fullName( booking.getFullName() );
+        bookingResponse.email( booking.getEmail() );
+        bookingResponse.phoneNumber( booking.getPhoneNumber() );
+        bookingResponse.address( booking.getAddress() );
+        if ( booking.getBookingStatus() != null ) {
+            bookingResponse.bookingStatus( booking.getBookingStatus().name() );
+        }
+        bookingResponse.paymentMethod( booking.getPaymentMethod() );
+
+        return bookingResponse.build();
     }
 }

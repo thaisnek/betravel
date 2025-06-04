@@ -12,5 +12,6 @@ public interface HistoryMapper {
     @Mapping(source = "timestamp", target = "timestamp")
     @Mapping(source = "tour.title", target = "tourTitle")
     @Mapping(source = "tour", target = "tourResponse")
+    @Mapping(source = "booking", target = "bookingResponse")
     HistoryResponseDTO toDto(History history);
 }

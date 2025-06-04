@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface HistoryService {
     Page<HistoryResponseDTO> getUserHistory(Long userId, ActionType actionType, Pageable pageable);
+    Page<HistoryResponseDTO> getAllHistory(Pageable pageable);
 }

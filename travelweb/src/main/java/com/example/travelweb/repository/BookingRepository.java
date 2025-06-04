@@ -16,11 +16,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByUserUserIDAndTourTourID(Long userId, Long tourId);
 
-    @Query("SELECT b.tour.tourID as id, b.tour.title as name, SUM(b.numAdults + b.numChildren) as booked, (b.tour.quantity - SUM(b.numAdults + b.numChildren)) as available " +
+    @Query("SELECT b.tour.tourID as id, b.tour.title as name, SUM(b.numAdults + b.numChildren) as booked, (b.tour.quantity) as available " +
             "FROM Booking b WHERE b.bookingStatus = com.example.travelweb.enums.BookingStatus.CONFIRMED GROUP BY b.tour.tourID, b.tour.title, b.tour.quantity ORDER BY booked DESC")
     List<TopTourProjection> findTop5ToursByConfirmedBookings(Pageable pageable);
 
-    @Query("SELECT b.user.userID as id, b.user.fullName as name, COUNT(b.bookingID) as totalPurchases, SUM(b.numChildren * b.tour.priceChild + b.numAdults * b.tour.priceAdult) as totalAmount " +
+    @Query("SELECT b.user.userID as id, b.user.fullName as name, COUNT(b.bookingID) as totalPurchases, SUM(b.totalPrice) as totalAmount " +
             "FROM Booking b WHERE b.bookingStatus = com.example.travelweb.enums.BookingStatus.CONFIRMED GROUP BY b.user.userID, b.user.fullName ORDER BY totalAmount DESC")
     List<TopCustomerProjection> findTop5CustomersByConfirmedBookings(Pageable pageable);
 

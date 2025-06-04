@@ -7,5 +7,5 @@ import com.example.travelweb.entity.Admin;
 public interface AdminService {
     AdminResponse createAdmin(AdminCreateRequest request);
 
-    Admin getAdminById(Long adminId);
+    AdminResponse getAdminById(Long adminId);
 }

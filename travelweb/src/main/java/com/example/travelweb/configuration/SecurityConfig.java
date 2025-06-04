@@ -34,8 +34,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**","/api/tours/**","/api/home/**","/images/**","/api/payment/success","/api/payment/cancel","/api/payment/**","/api/reviews/tour/**","/api/admin/create").permitAll()
-                        .requestMatchers("/api/admin/**","/api/admin/promotions","/api/contact/**").hasRole("ADMIN")
-                        .requestMatchers("/api/users/**","/api/reviews/**","/api/promotions/**","/api/history/**","/api/bookings/").hasRole("USER")
+                        .requestMatchers("/api/admin/**","/api/admin/promotions").hasRole("ADMIN")
+                        .requestMatchers("/api/users/**","/api/reviews/**","/api/promotions/**","/api/history/**","/api/bookings/**","/api/contacts/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

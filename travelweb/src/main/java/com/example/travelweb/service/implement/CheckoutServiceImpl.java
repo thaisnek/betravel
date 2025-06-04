@@ -52,8 +52,8 @@ public class CheckoutServiceImpl implements CheckoutService {
                 (double) booking.getTotalPrice() / 23000.0,
                 "USD",
                 "Payment for booking ID: " + bookingId,
-                "http://localhost:3000/payment/cancel",
-                "http://localhost:3000/payment/success"
+                "http://localhost:8080/ltweb/api/payment/cancel",
+                "http://localhost:8080/ltweb/api/payment/success"
         );
 
         for (com.paypal.api.payments.Links link : payment.getLinks()) {
@@ -84,6 +84,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         History history = new History();
         history.setUser(booking.getUser());
         history.setTour(booking.getTour());
+        history.setBooking(booking);
         history.setActionType(ActionType.PAY);
         history.setTimestamp(LocalDate.now());
         historyRepository.save(history);

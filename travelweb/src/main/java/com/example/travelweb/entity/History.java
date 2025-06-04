@@ -1,6 +1,7 @@
 package com.example.travelweb.entity;
 
 import com.example.travelweb.enums.ActionType;
+import com.example.travelweb.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,10 @@ public class History {
     @JoinColumn(name = "tourID", nullable = false)
     private Tour tour;
 
+    @ManyToOne
+    @JoinColumn(name = "bookingID")
+    private Booking booking;
+
     private ActionType actionType;
     private LocalDate timestamp;
 
@@ -32,6 +37,10 @@ public class History {
     }
 
     public void setTourId(Long tourId) {
+
+    }
+
+    public void setBookingStatus(BookingStatus bookingStatus) {
 
     }
 }

@@ -46,7 +46,7 @@ public class User {
     private List<Review> review;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Chat> chat;
+    private List<Contact> contacts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<History> histories;

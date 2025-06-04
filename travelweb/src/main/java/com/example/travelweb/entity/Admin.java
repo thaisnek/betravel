@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -26,5 +25,5 @@ public class Admin {
     private LocalDate createdDate;
 
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
-    private List<Chat> chats;
+    private List<Contact> contacts;
 }

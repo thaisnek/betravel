@@ -5,11 +5,13 @@ import com.example.travelweb.dto.response.AdminResponse;
 import com.example.travelweb.entity.Admin;
 import com.example.travelweb.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AdminController {
     @Autowired
     private AdminService adminService;
@@ -20,11 +22,8 @@ public class AdminController {
     }
 
     @GetMapping("/{adminId}")
-    public ResponseEntity<Admin> getAdminById(@PathVariable Long adminId) {
-        Admin admin = adminService.getAdminById(adminId);
-        if (admin == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(admin);
+    public ResponseEntity<AdminResponse> getAdminById(@PathVariable Long adminId) {
+        AdminResponse adminResponse = adminService.getAdminById(adminId);
+        return ResponseEntity.ok(adminResponse);
     }
 }
